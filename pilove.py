@@ -34,7 +34,7 @@ import sys
 import time
 
 # Release version of PiLove
-__version__='0.1'
+__version__='0.2'
 
 
 def import_xsysroot():
@@ -54,6 +54,34 @@ def import_xsysroot():
         return xsysroot
 
 
+def test_image(pilove):
+
+    count_failed=0
+    tests = [
+        { 'cmd' : '/usr/local/games/love-0.10.0/src/love --version', 'msg': 'Love app does not load' },
+        { 'cmd' : 'raspi2png --help', 'msg': 'Raspi2png could not be found' },
+        { 'cmd' : 'dpkg -l |grep libsdl2:armhf', 'msg': 'libSDL2 did not install' },
+        { 'cmd' : 'emacs --version', 'msg': 'Emacs did not install' },
+        { 'cmd' : 'find /usr/share/fonts/truetype/isabella', 'msg': 'Isabella fonts not installed' },
+        { 'cmd' : 'find /usr/share/fonts/truetype/fonts-georgewilliams', 'msg': 'GeorgeWilliams fonts not installed' }
+        ]
+
+    print '>>> RUNNIG TESTS'
+    for test in tests:
+        rc=pilove.execute(test['cmd'])
+        if rc:
+            print '>>> TEST FAILED: {}'.format(test['msg'])
+            count_failed += 1
+        else:
+            print '>>> TEST PASSED'
+
+    if count_failed:
+        print '>>> {} TESTS FAILED'.format(count_failed)
+    else:
+        print '>>> ALL TESTS PASSED!'
+
+    return count_failed
+
 
 if __name__ == '__main__':
 
@@ -62,7 +90,11 @@ if __name__ == '__main__':
 
     # Xsysroot profile name that holds the original pipaOS image
     # (See the file xsysroot.conf for details)
-    xsysroot_profile_name='pilove'
+    if len(sys.argv) < 2:
+        print 'Please specify a xsysroot profile name'
+        sys.exit(1)
+    else:
+        xsysroot_profile_name=sys.argv[1]
 
     # import the xsysroot module
     xsysroot=import_xsysroot()
@@ -130,6 +162,9 @@ if __name__ == '__main__':
         print 'ERROR: could not copy love build script in the image rc={}'.format(rc)
         sys.exit(1)
 
+    # HACK : this is the custom debian rules file to build SDL2 with RPi support
+    rc=os.system('cp {} {}'.format('debian-rules-sdl2', pilove.query('tmp')))
+
     # run the Love2D build script
     rc=pilove.execute('/bin/bash -c "cd /tmp ; ./{}"'.format(src_install_script))
     if rc:
@@ -147,6 +182,17 @@ if __name__ == '__main__':
     pilove.edfile(rclocal, '/usr/local/games/love-0.10.0/src/love &', append=True)
     pilove.edfile(rclocal, 'exit 0', append=True)
     rc=pilove.execute('chmod +x {}'.format(rclocal))
+
+    # define a shell alias to launch Love
+    pilove.edfile('/home/sysop/.bash_aliases', 'alias love=\"/usr/local/games/love-0.10.0/src/love\"', )
+    pilove.execute('chown sysop:sysop /home/sysop/.bash_aliases')
+
+    # Install emacs with LUA syntax mode, and additional free TrueType fonts
+    ttf_packages='fontconfig fonts-isabella fonts-georgewilliams fonts-linuxlibertine'
+    pilove.execute('apt-get install -y --no-install-recommends emacs24-nox lua-mode {}'.format(ttf_packages))
+
+    # run some basic tests on the image
+    test_image(pilove)
 
     # unmount the image
     if not pilove.umount():

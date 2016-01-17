@@ -13,3 +13,7 @@ Copy the file `xsysroot.conf` into your home directory, and download the latest 
 ## Build
 
 Run the script `build-pilove.sh` and sit back. The image file along with the SDL2 and Löve binaries will appear on your current directory.
+
+This is free software - See the LICENSE file for details
+
+Albert - January 2016

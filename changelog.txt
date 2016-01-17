@@ -1,0 +1,12 @@
+Version 0.2
+Date: Sun Jan 17, 2016
+  * Upgraded to latest SDL2 version 2.0.4
+  * Improved image compactness, it should fit on most 2GB SD cards
+  * Added more fonts available at /usr/share/fonts/truetype
+  * Added Emacs and LUA edition mode
+  * Added raspi2png, a tool to take screenshots from Love games
+
+Version 0.1
+Date: Sun Jan 9, 2016
+  * Love2D version 0.10.0
+  * SDL2 version 2.0.3, official branch from RetroPie
