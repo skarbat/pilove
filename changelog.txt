@@ -1,3 +1,12 @@
+Version 0.3
+Date: Wed Feb 20, 2016
+  * Added luarocks package
+  * luasocket and copas included via luarocks.
+  * Lua periphery included, allows simple acces to gpio, i2c, and UART port
+  * Lua GPIO interface included, a port of the classic Python GPIO package
+  * Changed love binary alias to a symlink, simply call love from any user now.
+  * Force audio be sent to HDMI output (hdmi_drive=2)
+
 Version 0.2
 Date: Sun Jan 17, 2016
   * Upgraded to latest SDL2 version 2.0.4

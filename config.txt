@@ -32,7 +32,7 @@
 
 # uncomment to force a HDMI mode rather than DVI. This can make audio work in
 # DMT (computer monitor) modes
-#hdmi_drive=2
+hdmi_drive=2
 
 # uncomment to increase signal to HDMI, if you have interference, blanking, or
 # no display

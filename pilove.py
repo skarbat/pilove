@@ -34,7 +34,7 @@ import sys
 import time
 
 # Release version of PiLove
-__version__='0.2'
+__version__='0.3'
 
 
 def import_xsysroot():
@@ -60,7 +60,9 @@ def test_image(pilove):
     tests = [
         { 'cmd' : '/usr/local/games/love-0.10.0/src/love --version', 'msg': 'Love app does not load' },
         { 'cmd' : 'raspi2png --help', 'msg': 'Raspi2png could not be found' },
-        { 'cmd' : 'dpkg -l |grep libsdl2:armhf', 'msg': 'libSDL2 did not install' },
+        { 'cmd' : 'dpkg -l | grep libsdl2:armhf', 'msg': 'libSDL2 did not install' },
+        { 'cmd' : 'luarocks list | grep lua-periphery', 'msg': 'LUA periphery did not install' },
+        { 'cmd' : 'luarocks list | grep rpi-gpio', 'msg': 'LUA RPi GPIO did not install' },
         { 'cmd' : 'emacs --version', 'msg': 'Emacs did not install' },
         { 'cmd' : 'find /usr/share/fonts/truetype/isabella', 'msg': 'Isabella fonts not installed' },
         { 'cmd' : 'find /usr/share/fonts/truetype/fonts-georgewilliams', 'msg': 'GeorgeWilliams fonts not installed' }
@@ -179,17 +181,20 @@ if __name__ == '__main__':
     rclocal='/etc/rc.local'
     pilove.edfile(rclocal, '#!/bin/bash')
     pilove.edfile(rclocal, 'pulseaudio --start', append=True)
-    pilove.edfile(rclocal, '/usr/local/games/love-0.10.0/src/love &', append=True)
+    pilove.edfile(rclocal, '/usr/local/bin/love &', append=True)
     pilove.edfile(rclocal, 'exit 0', append=True)
     rc=pilove.execute('chmod +x {}'.format(rclocal))
 
-    # define a shell alias to launch Love
-    pilove.edfile('/home/sysop/.bash_aliases', 'alias love=\"/usr/local/games/love-0.10.0/src/love\"', )
-    pilove.execute('chown sysop:sysop /home/sysop/.bash_aliases')
+    # create a symlink to reach love
+    rc=pilove.execute('ln -sfv {} {}'.format('/usr/local/games/love-0.10.0/src/love', '/usr/local/bin/love'))
 
     # Install emacs with LUA syntax mode, and additional free TrueType fonts
     ttf_packages='fontconfig fonts-isabella fonts-georgewilliams fonts-linuxlibertine'
-    pilove.execute('apt-get install -y --no-install-recommends emacs24-nox lua-mode {}'.format(ttf_packages))
+    pilove.execute('apt-get install -y --no-install-recommends emacs24-nox lua-mode luarocks {}'.format(ttf_packages))
+
+    # Install lua rocks to access the GPIO
+    pilove.execute('luarocks install lua-periphery')
+    pilove.execute('luarocks install rpi-gpio')
 
     # run some basic tests on the image
     test_image(pilove)
