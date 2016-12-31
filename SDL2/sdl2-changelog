@@ -1,0 +1,6 @@
+libsdl2 (2.0.5) UNRELEASED; urgency=low
+
+  * Updated SDL package names to version 2.0.5
+
+ -- Albert Casals <skarbat@gmail.com>  Sat, 31 Dec 2016 12:43:22 +0000
+

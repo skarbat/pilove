@@ -1,3 +1,10 @@
+Version 0.4
+Date: Sat Dec 31, 2016
+  * Based on latest Raspbian kernel 4.4.20-v7+
+  * Upgraded SDL to 2.0.5
+  * Upgraded Love2d to 10.0.2
+  * Updated luarocks components - call "luarocks list"
+
 Version 0.3
 Date: Wed Feb 20, 2016
   * Added luarocks package

@@ -32,33 +32,17 @@
 import os
 import sys
 import time
+import xsysroot
 
 # Release version of PiLove
-__version__='0.3'
-
-
-def import_xsysroot():
-    '''
-    Find path to XSysroot and import it
-    You need to create a symlink xsysroot.py -> xsysroot
-    '''
-    which_xsysroot=os.popen('which xsysroot').read().strip()
-    if not which_xsysroot:
-        print 'Could not find xsysroot tool'
-        print 'Please install from https://github.com/skarbat/xsysroot'
-        return None
-    else:
-        print 'xsysroot found at: {}'.format(which_xsysroot)
-        sys.path.append(os.path.dirname(which_xsysroot))
-        import xsysroot
-        return xsysroot
+__version__='0.4'
 
 
 def test_image(pilove):
 
     count_failed=0
     tests = [
-        { 'cmd' : '/usr/local/games/love-0.10.0/src/love --version', 'msg': 'Love app does not load' },
+        { 'cmd' : '/usr/local/games/love-0.10.2/src/love --version', 'msg': 'Love app does not load' },
         { 'cmd' : 'raspi2png --help', 'msg': 'Raspi2png could not be found' },
         { 'cmd' : 'dpkg -l | grep libsdl2:armhf', 'msg': 'libSDL2 did not install' },
         { 'cmd' : 'luarocks list | grep lua-periphery', 'msg': 'LUA periphery did not install' },
@@ -97,11 +81,6 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         xsysroot_profile_name=sys.argv[1]
-
-    # import the xsysroot module
-    xsysroot=import_xsysroot()
-    if not xsysroot:
-        sys.exit(1)
 
     # Find and activate the xsysroot profile
     try:
@@ -165,7 +144,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # HACK : this is the custom debian rules file to build SDL2 with RPi support
-    rc=os.system('cp {} {}'.format('debian-rules-sdl2', pilove.query('tmp')))
+    rc=os.system('cp {} {}'.format('SDL2/sdl2-debian-rules', pilove.query('tmp')))
+    rc=os.system('cp {} {}'.format('SDL2/sdl2-changelog', pilove.query('tmp')))
 
     # run the Love2D build script
     rc=pilove.execute('/bin/bash -c "cd /tmp ; ./{}"'.format(src_install_script))

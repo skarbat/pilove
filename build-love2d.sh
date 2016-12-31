@@ -69,10 +69,10 @@ fi
 
 # Build SDL
 cd /tmp
-sdl2_dir="sdl2.0.4"
+sdl2_dir="SDL2-2.0.5"
 if [ ! -d "$sdl2_dir" ]; then
     echo ">>> Getting SDL2 sources"
-    git clone https://github.com/spurious/SDL-mirror.git $sdl2_dir
+    curl -L "https://www.libsdl.org/release/SDL2-2.0.5.tar.gz" | tar -zx
 fi
 cd $sdl2_dir
 
@@ -80,12 +80,9 @@ echo ">>> Building SDL2"
 export CFLAGS="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
 export LDFLAGS="-L/opt/vc/lib"
 
-# HACK: the rules file pass special options to configure (--host and others)
-cp -fv ../debian-rules-sdl2 ./debian/rules
-
-#./configure --host=arm-raspberry-linux-gnueabihf --disable-pulseaudio --disable-esd --disable-video-mir --disable-video-wayland
-#make
-#make install
+# HACK: rules file to build specific for the RPI, and changelog for package names.
+cp -fv ../sdl2-debian-rules ./debian/rules
+cp -fv ../sdl2-changelog ./debian/changelog
 
 dpkg-buildpackage
 if [ "$?" != "0" ]; then
@@ -94,8 +91,8 @@ if [ "$?" != "0" ]; then
 else
     echo ">>> Installing SDL2 libraries"
     cd /tmp
-    dpkg -i libsdl2_2.0.4_armhf.deb
-    dpkg -i libsdl2-dev_2.0.4_armhf.deb
+    dpkg -i libsdl2_2.0.5_armhf.deb
+    dpkg -i libsdl2-dev_2.0.5_armhf.deb
 fi
 
 # stop if only SDL was required
@@ -106,15 +103,15 @@ fi
 
 # Build Love2d
 echo ">>> Building Love2D"
-love2d_url="https://bitbucket.org/rude/love/downloads/love-0.10.0-linux-src.tar.gz"
+love2d_url="https://bitbucket.org/rude/love/downloads/love-0.10.2-linux-src.tar.gz"
 love2d_tgz="lovesrc.tgz"
-love2d_bin="/tmp/pilove-0.10.0-bin.tgz"
+love2d_bin="/tmp/pilove-0.10.2-bin.tgz"
 
 cd /tmp
 curl -L $love2d_url > $love2d_tgz
 cd /usr/local/games
 tar zxf /tmp/$love2d_tgz
-cd love-0.10.0
+cd love-0.10.2
 ./configure
 if [ "$?" != "0" ]; then
     echo ">>> Error: running Love2D configure rc=$?"
@@ -126,7 +123,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 cd ..
-tar -zcf $love2d_bin love-0.10.0
+tar -zcf $love2d_bin love-0.10.2
 echo ">>> Love2D build completed"
 
 # Raspi2png is a tool to take screenshots
