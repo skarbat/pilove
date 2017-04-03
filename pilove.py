@@ -166,7 +166,7 @@ if __name__ == '__main__':
     rc=pilove.execute('chmod +x {}'.format(rclocal))
 
     # create a symlink to reach love
-    rc=pilove.execute('ln -sfv {} {}'.format('/usr/local/games/love-0.10.0/src/love', '/usr/local/bin/love'))
+    rc=pilove.execute('ln -sfv {} {}'.format('/usr/local/games/love-0.10.2/src/love', '/usr/local/bin/love'))
 
     # Install emacs with LUA syntax mode, and additional free TrueType fonts
     ttf_packages='fontconfig fonts-isabella fonts-georgewilliams fonts-linuxlibertine'
